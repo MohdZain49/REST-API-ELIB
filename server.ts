@@ -1,14 +1,15 @@
-import app from "./src/app.ts"
-import {config} from "./src/config/config.ts"
+import app from "./src/app.ts";
+import { config } from "./src/config/config.ts";
+import connectDB from "./src/config/db.ts";
 
+const startServer = async () => {
+  await connectDB();
 
-const startServer = () => {
   const port = config.port || 3000;
 
   app.listen(port, () => {
-    console.log(`Listening on port: ${port}`)
-  })
-}
-
+    console.log(`Listening on port: ${port}`);
+  });
+};
 
 startServer();
