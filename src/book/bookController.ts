@@ -179,20 +179,36 @@ const updateBook = async (req: Request, res: Response, next: NextFunction) => {
 
 const listBooks = async (req: Request, res: Response, next: NextFunction) => {
   try {
-
     const books = await bookModel.find();
 
-    if(!books) {
+    if (!books) {
       const err = createHttpError(500, "books are not found");
       return next(err);
     }
 
-    return res.json(books)
-
+    return res.json(books);
   } catch (error) {
-    const err = createHttpError(500, "Something went wrong")
-    return next(err)
+    const err = createHttpError(500, "Something went wrong");
+    return next(err);
   }
-}
+};
 
-export { createBook, updateBook, listBooks };
+const getBook = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { bookId } = req.params;
+
+    const book = await bookModel.findById(bookId);
+
+    if (!book) {
+      const err = createHttpError(500, "book not found");
+      return next(err);
+    }
+
+    return res.status(201).json(book);
+  } catch (error) {
+    const err = createHttpError(500, "Something went wrong");
+    return next(err);
+  }
+};
+
+export { createBook, updateBook, listBooks, getBook };

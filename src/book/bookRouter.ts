@@ -2,7 +2,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import express from "express";
-import { createBook, listBooks, updateBook } from "./bookController.ts";
+import { createBook, getBook, listBooks, updateBook } from "./bookController.ts";
 import multer from "multer";
 import authenticate from "../middlewares/authenticate.ts";
 
@@ -37,5 +37,7 @@ bookRouter.patch(
 );
 
 bookRouter.get("/", listBooks);
+
+bookRouter.get("/:bookId", getBook)
 
 export default bookRouter;
