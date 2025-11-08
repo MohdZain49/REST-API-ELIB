@@ -2,7 +2,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import express from "express";
-import { createBook, getBook, listBooks, updateBook } from "./bookController.ts";
+import { createBook, deleteBook, getBook, listBooks, updateBook } from "./bookController.ts";
 import multer from "multer";
 import authenticate from "../middlewares/authenticate.ts";
 
@@ -22,7 +22,7 @@ bookRouter.post(
   upload.fields([
     { name: "coverImage", maxCount: 1 },
     { name: "file", maxCount: 1 },
-  ]),
+  ]), 
   createBook
 );
 
@@ -38,6 +38,8 @@ bookRouter.patch(
 
 bookRouter.get("/", listBooks);
 
-bookRouter.get("/:bookId", getBook)
+bookRouter.get("/:bookId", getBook);
+
+bookRouter.delete("/:bookId",  authenticate, deleteBook)
 
 export default bookRouter;

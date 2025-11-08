@@ -12,7 +12,6 @@ const __dirname = path.dirname(__filename);
 
 const createBook = async (req: Request, res: Response, next: NextFunction) => {
   const { title, genre, description } = req.body;
-
   try {
     const files = req.files as
       | { [fieldname: string]: Express.Multer.File[] }
@@ -211,4 +210,43 @@ const getBook = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { createBook, updateBook, listBooks, getBook };
+const deleteBook = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { bookId } = req.params;
+
+    const book = await bookModel.findOne({ _id: bookId });
+
+    if (!book) {
+      const error = createHttpError(404, "book not found");
+      return next(error);
+    }
+
+    const _req = req as AuthRequest;
+
+    if (book.author.toString() !== _req.userId) {
+      return next(createHttpError(403, "unauthorized request"));
+    }
+
+    const coverFileSplits = book.coverImage.split("/");
+    const coverImagePublicId =
+      coverFileSplits.at(-2) + "/" + coverFileSplits.at(-1)?.split(".").at(-2);
+
+    const bookFileSplits = book.file.split("/");
+    const bookFilePublicId =
+      bookFileSplits.at(-2) + "/" + bookFileSplits.at(-1);
+
+    await cloudinary.uploader.destroy(coverImagePublicId);
+    await cloudinary.uploader.destroy(bookFilePublicId, {
+      resource_type: "raw",
+    });
+
+    await bookModel.deleteOne({ _id: bookId });
+
+    return res.sendStatus(204);
+  } catch (error) {
+    const err = createHttpError(500, "Something went wrong");
+    return next(err);
+  }
+};
+
+export { createBook, updateBook, listBooks, getBook, deleteBook };
